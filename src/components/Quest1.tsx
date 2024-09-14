@@ -11,12 +11,13 @@ const Quest1: React.FC = () => {
     useConnect();
   const { data: addresses } = useAddresses();
   return (
-    <main className="text-white p-6 flex flex-col max-w-screen-lg">
+    <main className="p-6 flex flex-col max-w-screen-lg">
       <h1 className={'text-4xl mb-3'}>Quest 1: Connecting a Wallet</h1>
       <Text p>
         In order to interact with Penumbra, you need a compatible wallet. One
         such option is{' '}
         <a
+          className={'underline font-medium'}
           href={
             'https://chromewebstore.google.com/detail/prax-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe'
           }
@@ -39,8 +40,9 @@ const Quest1: React.FC = () => {
         saved it properly.
       </Text>
       <Text p>
-        Next, click the Connect to Prax wallet button below and confirm the
-        Connection dialog.
+        Before you connect your wallet, websites cannot access any of your data.
+        It's all stored locally and securely on your device. To give a site
+        permission to access your data, click the Connect button below.
       </Text>
 
       {!loading && !connected && (
@@ -62,17 +64,23 @@ const Quest1: React.FC = () => {
       {connected && (
         <Text body>
           You have now connected Prax to this page. This means that the website
-          can access the data in your wallet. All your data is stored locally,
-          and pages <i>cannot access it until you connect your wallet.</i>
+          can access the data in your wallet, such as balances and transaction
+          history. A page can never access your seedphrase.
         </Text>
       )}
 
-      {addresses?.map((address) => (
-        <AddressViewComponent
-          key={address?.toBinary().toString()}
-          addressView={address}
-        />
-      ))}
+      <div className={'flex flex-col gap-3'}>
+        <h3 className={'text-lg font-medium mt-3'}>Your accounts:</h3>
+        {addresses?.map((address) => (
+          <AddressViewComponent
+            key={address?.toBinary().toString()}
+            addressView={address}
+          />
+        ))}
+        {!connected && (
+          <div>Can't access accounts until you've connected your wallet</div>
+        )}
+      </div>
 
       {connected && (
         <div className="mt-4 max-w-[10rem]">

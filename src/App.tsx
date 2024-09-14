@@ -9,7 +9,7 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <div className={'bg-[#000000] mx-auto w-fit'}>
+    <div className={'mx-auto w-fit'}>
       <QueryClientProvider client={queryClient}>
         <PenumbraUIProvider>
           <Router>

@@ -11,9 +11,8 @@ const Quest2: React.FC = () => {
   const { data } = useBalances();
 
   return (
-    <main className="text-white p-6 flex flex-col max-w-screen-lg">
+    <main className="p-6 flex flex-col max-w-screen-lg">
       <Text h1>Quest 2: Shielding Funds</Text>
-      <QuestCompletionIndicator questNumber={2} />
 
       <Text body>
         To shield funds, use{' '}
