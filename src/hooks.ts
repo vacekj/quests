@@ -7,6 +7,7 @@ import {
 } from '@penumbra-zone/client';
 import { ViewService } from '@penumbra-zone/protobuf';
 import { useQuery } from '@tanstack/react-query';
+import { uniqBy } from 'lodash';
 import { useEffect, useState } from 'react';
 
 // Common react api for fetching wallet data to render the list of injected wallets
@@ -113,10 +114,6 @@ export function useBalances(props?: UseBalancesProps) {
   const balances = useQuery({
     queryKey: ['balances'],
     queryFn: async () => {
-      const notes = client
-        .service(ViewService)
-        .notes({ addressIndex: { account: 0 } });
-
       const balances = await Array.fromAsync(
         client.service(ViewService).balances({}),
       );
@@ -127,4 +124,19 @@ export function useBalances(props?: UseBalancesProps) {
   });
 
   return balances;
+}
+
+export function useAddresses() {
+  const { data: balances } = useBalances();
+  const addresses = useQuery({
+    queryKey: ['addresses', balances],
+    queryFn: async () => {
+      return uniqBy(
+        balances?.map((balance) => balance.accountAddress) ?? [],
+        (a) => a?.toJsonString(),
+      );
+    },
+  });
+
+  return addresses;
 }

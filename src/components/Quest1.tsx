@@ -1,14 +1,15 @@
+import { client } from '@/src/penumbra';
+import { ViewService } from '@penumbra-zone/protobuf';
+import { AddressViewComponent } from '@penumbra-zone/ui/AddressViewComponent';
 import { Button } from '@penumbra-zone/ui/Button';
 import { Text } from '@penumbra-zone/ui/Text';
-import { useConnect, useWalletManifests } from '../hooks';
-import { useQuestStore } from '../store';
-import QuestCompletionIndicator from './QuestCompletionIndicator';
+import { useAddresses, useConnect, useWalletManifests } from '../hooks';
 
 const Quest1: React.FC = () => {
   const { data: wallets, loading } = useWalletManifests();
   const { connectionLoading, connected, onConnect, onDisconnect } =
     useConnect();
-
+  const { data: addresses } = useAddresses();
   return (
     <main className="text-white p-6 flex flex-col max-w-screen-lg">
       <h1 className={'text-4xl mb-3'}>Quest 1: Connecting a Wallet</h1>
@@ -65,6 +66,13 @@ const Quest1: React.FC = () => {
           and pages <i>cannot access it until you connect your wallet.</i>
         </Text>
       )}
+
+      {addresses?.map((address) => (
+        <AddressViewComponent
+          key={address?.toBinary().toString()}
+          addressView={address}
+        />
+      ))}
 
       {connected && (
         <div className="mt-4 max-w-[10rem]">
