@@ -5,7 +5,8 @@ import {
   PenumbraRequestFailure,
   PenumbraState,
 } from '@penumbra-zone/client';
-// copied over from https://github.com/penumbra-zone/nextjs-penumbra-client-example/blob/main/app/hooks.ts
+import { ViewService } from '@penumbra-zone/protobuf';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 // Common react api for fetching wallet data to render the list of injected wallets
@@ -104,3 +105,26 @@ export const useConnect = () => {
     onDisconnect,
   };
 };
+type UseBalancesProps = {
+  accountSelector?: string;
+};
+
+export function useBalances(props?: UseBalancesProps) {
+  const balances = useQuery({
+    queryKey: ['balances'],
+    queryFn: async () => {
+      const notes = client
+        .service(ViewService)
+        .notes({ addressIndex: { account: 0 } });
+
+      const balances = await Array.fromAsync(
+        client.service(ViewService).balances({}),
+      );
+
+      console.log(balances);
+      return balances;
+    },
+  });
+
+  return balances;
+}

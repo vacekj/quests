@@ -1,27 +1,33 @@
-// src/App.tsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { PenumbraUIProvider } from '@penumbra-zone/ui/PenumbraUIProvider';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Quest1 from './components/Quest1';
 import Quest2 from './components/Quest2';
-import { PenumbraUIProvider } from '@penumbra-zone/ui/PenumbraUIProvider';
-import "./main.css";
+import './main.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <PenumbraUIProvider>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Quest1 />
-                <Quest2 />{' '}
-              </>
-            }
-          />
-        </Routes>
-      </Router>
-    </PenumbraUIProvider>
+    <div className={'bg-[#000000] mx-auto w-fit'}>
+      <QueryClientProvider client={queryClient}>
+        <PenumbraUIProvider>
+          <Router>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Quest1 />
+                    <Quest2 />
+                  </>
+                }
+              />
+            </Routes>
+          </Router>
+        </PenumbraUIProvider>
+      </QueryClientProvider>
+    </div>
   );
 }
 
