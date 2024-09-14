@@ -1,8 +1,8 @@
 import { client } from '@/src/penumbra';
+import { Box, Heading, Link, VStack } from '@chakra-ui/react';
 import { ViewService } from '@penumbra-zone/protobuf';
 import { AddressViewComponent } from '@penumbra-zone/ui/AddressViewComponent';
 import { Button } from '@penumbra-zone/ui/Button';
-import { Text } from '@penumbra-zone/ui/Text';
 import { useAddresses, useConnect, useWalletManifests } from '../hooks';
 
 const Quest1: React.FC = () => {
@@ -11,23 +11,23 @@ const Quest1: React.FC = () => {
     useConnect();
   const { data: addresses } = useAddresses();
   return (
-    <main className="p-6 flex flex-col max-w-screen-lg">
-      <h1 className={'text-4xl mb-3'}>Quest 1: Connecting a Wallet</h1>
-      <Text p>
+    <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
+      <Heading as={'h1'}>Quest 1: Connecting a Wallet</Heading>
+      <Box>
         In order to interact with Penumbra, you need a compatible wallet. One
         such option is{' '}
-        <a
-          className={'underline font-medium'}
+        <Link
+          textDecor={'underline'}
           href={
             'https://chromewebstore.google.com/detail/prax-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe'
           }
         >
           Prax Wallet
-        </a>
+        </Link>
         . Visit the link and click Add to Chrome to install it, then come back
         to this page.
-      </Text>
-      <Text p>
+      </Box>
+      <Box>
         When you first open the extension by clicking it in the Chrome toolbar,
         select Create a new wallet. During the guided tutorial, you'll need to
         set a passphrase to protect your wallet. The passphrase is not the same
@@ -38,40 +38,38 @@ const Quest1: React.FC = () => {
         recovery phrase securely, for example in a password manager. Re-enter
         portions of the recovery phrase when prompted, to confirm that you've
         saved it properly.
-      </Text>
-      <Text p>
+      </Box>
+      <Box>
         Before you connect your wallet, websites cannot access any of your data.
         It's all stored locally and securely on your device. To give a site
         permission to access your data, click the Connect button below.
-      </Text>
+      </Box>
 
-      {!loading && !connected && (
-        <div className="mt-4 max-w-4xl">
-          {Object.entries(wallets).map(([origin, manifest]) => (
-            <Button
-              key={origin}
-              onClick={() => onConnect(origin)}
-              disabled={connectionLoading}
-            >
-              {connectionLoading
-                ? 'Connecting...'
-                : `Connect to ${manifest.name}`}
-            </Button>
-          ))}
-        </div>
-      )}
+      {!loading &&
+        !connected &&
+        Object.entries(wallets).map(([origin, manifest]) => (
+          <Button
+            key={origin}
+            onClick={() => onConnect(origin)}
+            disabled={connectionLoading}
+          >
+            {connectionLoading
+              ? 'Connecting...'
+              : `Connect to ${manifest.name}`}
+          </Button>
+        ))}
 
       {connected && (
-        <Text body>
+        <Box>
           You have now connected Prax to this page. This means that the website
           can access the data in your wallet, such as balances and transaction
           history. A page can never access your seedphrase.
-        </Text>
+        </Box>
       )}
 
-      <div className={'flex flex-col gap-3'}>
-        <h3 className={'text-lg font-medium mt-3'}>Your accounts:</h3>
-        {addresses?.map((address) => (
+      <VStack alignItems={'start'} gap={3}>
+        <Heading size={'md'}>Your accounts:</Heading>
+        {addresses?.slice(0, 4).map((address) => (
           <AddressViewComponent
             key={address?.toBinary().toString()}
             addressView={address}
@@ -80,10 +78,10 @@ const Quest1: React.FC = () => {
         {!connected && (
           <div>Can't access accounts until you've connected your wallet</div>
         )}
-      </div>
+      </VStack>
 
       {connected && (
-        <div className="mt-4 max-w-[10rem]">
+        <Box>
           <Button
             key={origin}
             onClick={() => onDisconnect()}
@@ -91,9 +89,9 @@ const Quest1: React.FC = () => {
           >
             Disconnect
           </Button>
-        </div>
+        </Box>
       )}
-    </main>
+    </Box>
   );
 };
 
