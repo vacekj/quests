@@ -106,13 +106,10 @@ export const useConnect = () => {
     onDisconnect,
   };
 };
-type UseBalancesProps = {
-  accountSelector?: string;
-};
 
-export function useBalances(props?: UseBalancesProps) {
+export function useBalances() {
   const { connected } = useConnect();
-  const balances = useQuery({
+  return useQuery({
     queryKey: ['balances', connected],
     staleTime: 0,
     queryFn: async () => {
@@ -124,14 +121,28 @@ export function useBalances(props?: UseBalancesProps) {
       return balances;
     },
   });
+}
 
-  return balances;
+export function useNotes() {
+  const { connected } = useConnect();
+  return useQuery({
+    queryKey: ['notes', connected],
+    staleTime: 0,
+    queryFn: async () => {
+      const notes = await Array.fromAsync(
+        client.service(ViewService).notes({}),
+      );
+
+      console.log(notes);
+      return notes;
+    },
+  });
 }
 
 export function useAddresses() {
   const { connected } = useConnect();
   const { data: balances } = useBalances();
-  const addresses = useQuery({
+  return useQuery({
     queryKey: ['addresses', balances, connected],
     staleTime: 0,
     queryFn: async () => {
@@ -141,6 +152,4 @@ export function useAddresses() {
       );
     },
   });
-
-  return addresses;
 }

@@ -5,7 +5,7 @@ import { AddressViewComponent } from '@penumbra-zone/ui/AddressViewComponent';
 import { Button } from '@penumbra-zone/ui/Button';
 import { useAddresses, useConnect, useWalletManifests } from '../hooks';
 
-const Quest1: React.FC = () => {
+const WalletInstall: React.FC = () => {
   const { data: wallets, loading } = useWalletManifests();
   const { connectionLoading, connected, onConnect, onDisconnect } =
     useConnect();
@@ -95,4 +95,4 @@ const Quest1: React.FC = () => {
   );
 };
 
-export default Quest1;
+export default WalletInstall;

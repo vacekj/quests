@@ -1,37 +1,44 @@
-import { client } from '@/src/penumbra.ts';
 import {
   Alert,
   AlertDescription,
   AlertIcon,
-  AlertTitle,
   Box,
   Heading,
   Link,
 } from '@chakra-ui/react';
-import { ViewService } from '@penumbra-zone/protobuf';
-import { Text } from '@penumbra-zone/ui/Text';
+
+import { CommitmentSource_Ics20Transfer } from '@penumbra-zone/protobuf/penumbra/core/component/sct/v1/sct_pb';
 import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
 import type React from 'react';
-import { useBalances } from '../hooks';
-import { useQuestStore } from '../store';
-import QuestCompletionIndicator from './QuestCompletionIndicator';
+import { useBalances, useNotes } from '../hooks';
 
-const Quest2: React.FC = () => {
-  const { data } = useBalances();
-
+const Staking: React.FC = () => {
+  const { data: balances } = useBalances();
+  const completed = balances?.some(
+    (balance) =>
+      balance?.balanceView?.valueView.case === 'knownAssetId' &&
+      balance?.balanceView?.valueView?.value?.metadata?.symbol.includes(
+        'delUM(',
+      ),
+  );
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
-      <Heading as={'h1'}>Quest 2: Shielding Funds</Heading>
-
+      <Heading as={'h1'}>Quest 3: Staking</Heading>
+      {completed && (
+        <Alert status="success">
+          <AlertIcon />
+          Staking completed succesfully!
+        </Alert>
+      )}
       <div>
         Now it's time to shield your funds and transfer them into Penumbra. Pick
         an account from Prax by clicking the extension icon, click the IBC
-        Deposit Address checkbox, and copy the address.
+        Staking Address checkbox, and copy the address.
       </div>
       <Alert status={'info'}>
         <AlertIcon />
         <AlertDescription>
-          IBC Deposit addresses exist because source chains record the deposit
+          IBC Staking addresses exist because source chains record the deposit
           address. They serve as an additional layer of anonymity to not link
           your deposit and actual addresses.
         </AlertDescription>
@@ -46,7 +53,7 @@ const Quest2: React.FC = () => {
           Skip Protocol
         </Link>
         &nbsp; to bridge funds into Penumbra. Go to the Skip app, and input your
-        IBC Deposit address. Select your source chain and asset (we recommend
+        IBC Staking address. Select your source chain and asset (we recommend
         USDC, but any common asset is fine) and select Penumbra and USDC as the
         destination chain. Then initiate the deposit and come back to this page.
       </Box>
@@ -58,14 +65,8 @@ const Quest2: React.FC = () => {
           balances.
         </AlertDescription>
       </Alert>
-      {data?.map((balanceRespone) => (
-        <ValueViewComponent
-          valueView={balanceRespone.balanceView}
-          key={balanceRespone.toBinary().toString()}
-        />
-      ))}
     </Box>
   );
 };
 
-export default Quest2;
+export default Staking;
