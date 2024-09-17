@@ -3,27 +3,52 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
+  Flex,
   Heading,
   Link,
 } from '@chakra-ui/react';
-
-import { CommitmentSource_Ics20Transfer } from '@penumbra-zone/protobuf/penumbra/core/component/sct/v1/sct_pb';
+import type {
+  ValueView,
+  ValueView_KnownAssetId,
+} from '@penumbra-zone/protobuf/penumbra/core/asset/v1/asset_pb';
+import type { BalancesResponse } from '@penumbra-zone/protobuf/penumbra/view/v1/view_pb';
 import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
 import type React from 'react';
 import { useBalances, useNotes } from '../hooks';
 
 const Deposit: React.FC = () => {
   const { data } = useNotes();
-  const completed = data?.some(
+  const depositNotes = data?.filter(
     (note) => note?.noteRecord?.source?.source.case === 'ics20Transfer',
   );
+  const { data: balances } = useBalances();
+  const knownBalances = balances?.filter(
+    (balance) => balance.balanceView?.valueView.case === 'knownAssetId',
+  );
+  const depositedBalances: BalancesResponse[] =
+    knownBalances?.filter((balance) =>
+      depositNotes?.some((note) =>
+        note.noteRecord?.note?.value?.assetId?.equals(
+          (balance.balanceView?.valueView?.value as ValueView_KnownAssetId)
+            ?.metadata?.penumbraAssetId,
+        ),
+      ),
+    ) ?? [];
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <Heading as={'h1'}>Quest 2: Shielding Funds</Heading>
-      {completed && (
+      {depositNotes && (
         <Alert status="success">
           <AlertIcon />
-          Deposit completed succesfully!
+          Deposit completed succesfully! Received
+          <Flex gap={3} px={3}>
+            {depositedBalances?.map((balance) => (
+              <ValueViewComponent
+                key={balance.toJsonString()}
+                valueView={balance.balanceView as ValueView}
+              />
+            ))}
+          </Flex>
         </Alert>
       )}
       <div>
@@ -61,11 +86,6 @@ const Deposit: React.FC = () => {
           balances.
         </AlertDescription>
       </Alert>
-      {data?.map((notesResponse) => (
-        <pre key={notesResponse.toJsonString()}>
-          {JSON.stringify(notesResponse?.noteRecord?.source, null, 4)}
-        </pre>
-      ))}
     </Box>
   );
 };

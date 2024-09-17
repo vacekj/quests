@@ -3,12 +3,18 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
+  Button,
+  Flex,
   Heading,
+  Image,
   Link,
+  ListItem,
+  Text,
+  UnorderedList,
+  VStack,
+  useColorModeValue,
 } from '@chakra-ui/react';
 
-import { CommitmentSource_Ics20Transfer } from '@penumbra-zone/protobuf/penumbra/core/component/sct/v1/sct_pb';
-import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
 import type React from 'react';
 import { useBalances, useNotes } from '../hooks';
 
@@ -21,50 +27,84 @@ const Staking: React.FC = () => {
         'delUM(',
       ),
   );
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const textColor = useColorModeValue('gray.800', 'white');
+
   return (
-    <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
-      <Heading as={'h1'}>Quest 3: Staking</Heading>
-      {completed && (
-        <Alert status="success">
-          <AlertIcon />
-          Staking completed succesfully!
-        </Alert>
-      )}
-      <div>
-        Now it's time to shield your funds and transfer them into Penumbra. Pick
-        an account from Prax by clicking the extension icon, click the IBC
-        Staking Address checkbox, and copy the address.
-      </div>
-      <Alert status={'info'}>
-        <AlertIcon />
-        <AlertDescription>
-          IBC Staking addresses exist because source chains record the deposit
-          address. They serve as an additional layer of anonymity to not link
-          your deposit and actual addresses.
-        </AlertDescription>
-      </Alert>
-      <Box>
-        We will use&nbsp;
-        <Link
-          textDecor={'underline'}
-          href={'https://go.skip.build/'}
-          className={'font-medium underline'}
-        >
-          Skip Protocol
-        </Link>
-        &nbsp; to bridge funds into Penumbra. Go to the Skip app, and input your
-        IBC Staking address. Select your source chain and asset (we recommend
-        USDC, but any common asset is fine) and select Penumbra and USDC as the
-        destination chain. Then initiate the deposit and come back to this page.
-      </Box>
-      <Alert status={'info'}>
-        <AlertIcon />
-        <AlertDescription>
-          Penumbra supports paying fees in multiple tokens, including USDC. Prax
-          will always choose the best token to pay fees with depending on your
-          balances.
-        </AlertDescription>
-      </Alert>
+    <Box bg={bgColor} color={textColor} p={8}>
+      <VStack spacing={6} align="stretch">
+        <Heading as="h1" size="2xl">
+          Staking
+        </Heading>
+
+        <Text>
+          If you hold the staking token `UM` you can delegate, or stake, those
+          tokens to a validator. This enables you to receive rewards and
+          participate in governance in exchange for taking on the risk of
+          validator misbehavior.
+        </Text>
+
+        <VStack spacing={4} align="stretch">
+          <Text>To stake with Prax, follow these steps:</Text>
+          <UnorderedList spacing={2} pl={4}>
+            <ListItem>
+              First ensure you hold the Penumbra protocol's staking token `UM`.
+            </ListItem>
+            <ListItem>Next, select the `Stake` tab on your frontend.</ListItem>
+            <ListItem>
+              On the `Stake` tab, you can see how much `UM` you have available
+              to delegate, along with a list of possible validators.
+            </ListItem>
+          </UnorderedList>
+        </VStack>
+
+        <Text>For each validator, you will see some important data:</Text>
+        <UnorderedList spacing={2} pl={4}>
+          <ListItem>
+            `VP`: the voting power of the validator in the governance system,
+          </ListItem>
+          <ListItem>`Com`: the commission rate that validator takes.</ListItem>
+        </UnorderedList>
+
+        <VStack spacing={4} align="stretch">
+          <Text>
+            Once you select a validator to stake with, you can click the
+            `Delegate` button.
+          </Text>
+          <Text>
+            Select how much `UM` you wish to delegate, then press `Delegate`:
+          </Text>
+          <Image
+            src="/api/placeholder/600/400"
+            alt="Delegation amount example"
+          />
+        </VStack>
+
+        <Text>
+          It will take a few moments for the delegation transaction to be
+          prepared, then Prax will generate a view of your transaction. Verify
+          one of the outputs is to the validator you selected, then click
+          `Approve`:
+        </Text>
+        <Image src="/api/placeholder/600/400" alt="Delegation Prax example" />
+
+        <Text>
+          You should see a pop-up in the lower right hand of the page indicating
+          that the transaction was approved!
+        </Text>
+        <Image src="/api/placeholder/600/400" alt="Delegation popup example" />
+
+        <Text>
+          You will receive the delegation token associated with that validator.
+          At a later point, you can undelegate by clicking the `Undelegate`
+          button to undelegate from that validator, and receive staking tokens.
+        </Text>
+
+        <Flex justifyContent="space-between" mt={6}>
+          <Button colorScheme="blue">Delegate</Button>
+          <Button colorScheme="red">Undelegate</Button>
+        </Flex>
+      </VStack>
     </Box>
   );
 };
