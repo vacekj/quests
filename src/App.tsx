@@ -1,19 +1,13 @@
 import Staking from '@/src/components/Staking.tsx';
-import { ChevronRightIcon } from '@chakra-ui/icons';
 import {
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Button,
   ChakraProvider,
   Container,
   Flex,
   Heading,
-  Input,
   Progress,
   VStack,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { PenumbraUIProvider } from '@penumbra-zone/ui/PenumbraUIProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -51,7 +45,6 @@ const pages = [
 
 function App() {
   const [currentPage, setCurrentPage] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
   const progress = ((currentPage + 1) / pages.length) * 100;
   return (
     <ChakraProvider theme={theme}>
@@ -80,8 +73,12 @@ function App() {
 
                     {/* Progress bar */}
                     <Progress
-                      value={progress}
                       size="sm"
+                      value={progress}
+                      css={
+                        '* {transition: 0.4s cubic-bezier(0.22,0.61,0.36,1)}'
+                      }
+                      transition={'0.5s linear'}
                       colorScheme="orange"
                       rounded={'sm'}
                     />
