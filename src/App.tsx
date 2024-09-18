@@ -1,4 +1,5 @@
 import Staking from '@/src/components/Staking.tsx';
+import { useQuestStore } from '@/src/store.ts';
 import {
   Box,
   Button,
@@ -45,7 +46,7 @@ const pages = [
 
 function App() {
   const [currentPage, setCurrentPage] = useState(0);
-  const progress = ((currentPage + 1) / pages.length) * 100;
+  const { completionPercent } = useQuestStore();
   return (
     <ChakraProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
@@ -74,13 +75,14 @@ function App() {
                     {/* Progress bar */}
                     <Progress
                       size="sm"
-                      value={progress}
+                      value={completionPercent()}
                       css={
                         '* {transition: 0.4s cubic-bezier(0.22,0.61,0.36,1)}'
                       }
                       transition={'0.5s linear'}
                       colorScheme="orange"
                       rounded={'sm'}
+                      margin="1.5rem"
                     />
 
                     <Flex>

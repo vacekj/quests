@@ -117,7 +117,6 @@ export function useBalances() {
         client.service(ViewService).balances({}),
       );
 
-      console.log(balances);
       return balances;
     },
   });
@@ -139,17 +138,54 @@ export function useNotes() {
   });
 }
 
-export function useAddresses() {
+export function useAddressesWithBalance() {
   const { connected } = useConnect();
   const { data: balances } = useBalances();
   return useQuery({
-    queryKey: ['addresses', balances, connected],
+    queryKey: ['addressesWithBalance', balances, connected],
     staleTime: 0,
     queryFn: async () => {
       return uniqBy(
         balances?.map((balance) => balance.accountAddress) ?? [],
         (a) => a?.toJsonString(),
       );
+    },
+  });
+}
+
+export function useAddresses(count: number) {
+  const { connected } = useConnect();
+
+  return useQuery({
+    queryKey: ['addresses', connected],
+    staleTime: 0,
+    queryFn: async () => {
+      return await Promise.all(
+        Array(count)
+          .fill(undefined)
+          .map((_, index) =>
+            client.service(ViewService).addressByIndex({
+              addressIndex: {
+                account: index,
+              },
+            }),
+          ),
+      );
+    },
+  });
+}
+
+export function useEphemeralAddress({ index }: { index: number }) {
+  const { connected } = useConnect();
+  return useQuery({
+    queryKey: ['ephemeralAddress', connected],
+    staleTime: 0,
+    queryFn: async () => {
+      return client.service(ViewService).ephemeralAddress({
+        addressIndex: {
+          account: index,
+        },
+      });
     },
   });
 }

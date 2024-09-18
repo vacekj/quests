@@ -1,15 +1,27 @@
 import { client } from '@/src/penumbra';
 import { Box, Heading, Link, VStack } from '@chakra-ui/react';
 import { ViewService } from '@penumbra-zone/protobuf';
+import type {
+  AddressView,
+  AddressView_Decoded,
+} from '@penumbra-zone/protobuf/penumbra/core/keys/v1/keys_pb';
 import { AddressViewComponent } from '@penumbra-zone/ui/AddressViewComponent';
 import { Button } from '@penumbra-zone/ui/Button';
-import { useAddresses, useConnect, useWalletManifests } from '../hooks';
+import { useQuery } from '@tanstack/react-query';
+import {
+  useAddresses,
+  useAddressesWithBalance,
+  useConnect,
+  useEphemeralAddress,
+  useWalletManifests,
+} from '../hooks';
 
 const WalletInstall: React.FC = () => {
   const { data: wallets, loading } = useWalletManifests();
   const { connectionLoading, connected, onConnect, onDisconnect } =
     useConnect();
-  const { data: addresses } = useAddresses();
+  const { data: addresses } = useAddresses(3);
+
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <Heading as={'h1'}>Quest 1: Connecting a Wallet</Heading>
@@ -68,11 +80,20 @@ const WalletInstall: React.FC = () => {
       )}
 
       <VStack alignItems={'start'} gap={3}>
-        <Heading size={'md'}>Your accounts:</Heading>
-        {addresses?.slice(0, 4).map((address) => (
+        <Heading size={'md'}>Here are your first 3 accounts:</Heading>
+        {addresses?.map((address) => (
           <AddressViewComponent
             key={address?.toBinary().toString()}
-            addressView={address}
+            addressView={
+              {
+                addressView: {
+                  value: {
+                    address: address.address,
+                  } as AddressView_Decoded,
+                  case: 'decoded',
+                },
+              } as AddressView
+            }
           />
         ))}
         {!connected && (

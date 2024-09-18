@@ -5,15 +5,14 @@ interface QuestState {
   completedQuests: number[];
   markQuestComplete: (questNumber: number) => void;
   markQuestIncomplete: (questNumber: number) => void;
-  completionPercent: () => string;
+  completionPercent: () => number;
 }
 
 export const useQuestStore = create<QuestState>()(
   persist(
     (set, get) => ({
       completedQuests: [],
-      completionPercent: () =>
-        (100 * (get().completedQuests.length / 7)).toFixed(0),
+      completionPercent: () => 100 * (get().completedQuests.length / 7),
       markQuestComplete: (questNumber) =>
         set((state) => ({
           completedQuests: Array.from(
