@@ -77,7 +77,7 @@ function App() {
                       size="sm"
                       value={completionPercent()}
                       css={
-                        '* {transition: 0.4s cubic-bezier(0.22,0.61,0.36,1)}'
+                        '& > * {transition: 0.4s cubic-bezier(0.22,0.61,0.36,1)}'
                       }
                       transition={'0.5s linear'}
                       colorScheme="orange"

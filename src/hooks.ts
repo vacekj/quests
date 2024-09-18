@@ -12,30 +12,20 @@ import { useEffect, useState } from 'react';
 
 // Common react api for fetching wallet data to render the list of injected wallets
 export const useWalletManifests = () => {
-  const [manifests, setManifests] = useState<Record<string, PenumbraManifest>>(
-    {},
-  );
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const loadManifests = async () => {
-    setLoading(true);
-    const res = PenumbraClient.getProviderManifests();
-    const resolvedManifests = await Promise.all(
-      Object.entries(res).map(async ([key, promise]) => {
-        const value = await promise;
-        return [key, value];
-      }),
-    );
-    setManifests(Object.fromEntries(resolvedManifests));
-    setLoading(false);
-  };
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    loadManifests();
-  }, []);
-
-  return { data: manifests, loading };
+  return useQuery<Record<string, PenumbraManifest>>({
+    queryKey: ['providerManifests'],
+    staleTime: 0,
+    queryFn: async () => {
+      const res = PenumbraClient.getProviderManifests();
+      const resolvedManifests = await Promise.all(
+        Object.entries(res).map(async ([key, promise]) => {
+          const value = await promise;
+          return [key, value];
+        }),
+      );
+      return Object.fromEntries(resolvedManifests ?? {});
+    },
+  });
 };
 
 export const useConnect = () => {
