@@ -1,4 +1,10 @@
+import { ChevronRightIcon } from '@chakra-ui/icons';
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Alert,
   AlertDescription,
   AlertIcon,
@@ -11,46 +17,50 @@ import type {
   ValueView,
   ValueView_KnownAssetId,
 } from '@penumbra-zone/protobuf/penumbra/core/asset/v1/asset_pb';
-import type { BalancesResponse } from '@penumbra-zone/protobuf/penumbra/view/v1/view_pb';
+import type { CommitmentSource_Ics20Transfer } from '@penumbra-zone/protobuf/penumbra/core/component/sct/v1/sct_pb';
+import type {
+  BalancesResponse,
+  NotesResponse,
+} from '@penumbra-zone/protobuf/penumbra/view/v1/view_pb';
 import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
+import { capitalize } from 'es-toolkit';
 import type React from 'react';
-import { useBalances, useNotes } from '../hooks';
+import { useBalances, useCurrentChainStatus, useNotes } from '../hooks';
 
 const Deposit: React.FC = () => {
   const { data } = useNotes();
+  const { data: status } = useCurrentChainStatus();
+  const currentBlock = BigInt(status?.syncInfo?.latestBlockHeight ?? 0);
   const depositNotes = data?.filter(
     (note) => note?.noteRecord?.source?.source.case === 'ics20Transfer',
   );
+
   const { data: balances } = useBalances();
   const knownBalances = balances?.filter(
     (balance) => balance.balanceView?.valueView.case === 'knownAssetId',
   );
-  const depositedBalances: BalancesResponse[] =
-    knownBalances?.filter((balance) =>
-      depositNotes?.some((note) =>
-        note.noteRecord?.note?.value?.assetId?.equals(
-          (balance.balanceView?.valueView?.value as ValueView_KnownAssetId)
-            ?.metadata?.penumbraAssetId,
+
+  const depositsWithNotes =
+    (knownBalances
+      ?.map((balance) => ({
+        note: depositNotes?.find((note) =>
+          note.noteRecord?.note?.value?.assetId?.equals(
+            (balance.balanceView?.valueView?.value as ValueView_KnownAssetId)
+              ?.metadata?.penumbraAssetId,
+          ),
         ),
-      ),
-    ) ?? [];
+        balance,
+      }))
+      .filter(({ note }) => note !== undefined) as BalanceWithNote[]) ?? [];
+
+  const depositedBalances = depositsWithNotes.filter(
+    ({ note }) => currentBlock - (note.noteRecord?.heightCreated ?? 0n) < 50,
+  );
+
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <Heading as={'h1'}>Quest 2: Shielding Funds</Heading>
-      {depositNotes && (
-        <Alert status="success">
-          <AlertIcon />
-          Deposit completed succesfully! Received
-          <Flex gap={3} px={3}>
-            {depositedBalances?.map((balance) => (
-              <ValueViewComponent
-                key={balance.toJsonString()}
-                valueView={balance.balanceView as ValueView}
-              />
-            ))}
-          </Flex>
-        </Alert>
-      )}
+
       <div>
         Now it's time to shield your funds and transfer them into Penumbra. Pick
         an account from Prax by clicking the extension icon, click the IBC
@@ -86,8 +96,80 @@ const Deposit: React.FC = () => {
           balances.
         </AlertDescription>
       </Alert>
+      <Accordion
+        allowToggle
+        borderWidth={'0'}
+        css={'* { border-width: 0!important;}'}
+      >
+        <AccordionItem>
+          <AccordionButton color={'grey'}>
+            <Box as="span" flex="1" textAlign="left">
+              Show old deposits
+            </Box>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel>
+            {depositsWithNotes.length > 0 &&
+              depositsWithNotes?.map((balanceWithNote) => {
+                return (
+                  <DepositRow
+                    key={JSON.stringify(balanceWithNote)}
+                    balanceWithNote={balanceWithNote}
+                  />
+                );
+              })}
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
+
+      {depositedBalances.length > 0 &&
+        depositedBalances.map(({ balance, note }) => (
+          <Alert key={note.toJsonString()} status="success">
+            <AlertIcon />
+            Deposit completed succesfully! Received
+            <Flex direction={'column'} gap={3} px={3}>
+              <ValueViewComponent
+                key={balance.toJsonString()}
+                valueView={balance.balanceView as ValueView}
+              />
+            </Flex>
+          </Alert>
+        ))}
     </Box>
   );
 };
+
+type BalanceWithNote = {
+  note: NotesResponse;
+  balance: BalancesResponse;
+};
+
+function DepositRow({
+  balanceWithNote: { balance, note },
+}: {
+  balanceWithNote: BalanceWithNote;
+}) {
+  const source = note.noteRecord?.source?.source
+    ?.value as CommitmentSource_Ics20Transfer;
+  const chainId = source.sender.replace(/^(\D+)(\d).*$/, '$1-$2');
+  const chainName = capitalize(source.sender.replace(/^(\D+).*$/, '$1'));
+  return (
+    <Flex gap={3} alignItems={'center'} key={balance.toJsonString()}>
+      Deposited
+      <ValueViewComponent
+        key={balance.toJsonString()}
+        valueView={balance.balanceView as ValueView}
+      />
+      from {chainName}
+      <ChevronRightIcon />
+      <Link
+        textDecoration={'underline'}
+        href={`https://ibc.range.org/ibc/status?id=${chainId}/${source.channelId}/${source.packetSeq}`}
+      >
+        Inspect deposit
+      </Link>
+    </Flex>
+  );
+}
 
 export default Deposit;

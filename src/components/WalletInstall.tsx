@@ -1,5 +1,14 @@
 import { client } from '@/src/penumbra';
-import { Box, Button, Heading, Link, VStack } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Link,
+  VStack,
+} from '@chakra-ui/react';
 import { ViewService } from '@penumbra-zone/protobuf';
 import type {
   AddressView,
@@ -8,6 +17,7 @@ import type {
 import { AddressViewComponent } from '@penumbra-zone/ui/AddressViewComponent';
 import { Button as PenumbraButton } from '@penumbra-zone/ui/Button';
 import { useQuery } from '@tanstack/react-query';
+import type React from 'react';
 import {
   useAddresses,
   useAddressesWithBalance,
@@ -18,7 +28,6 @@ import {
 
 const WalletInstall: React.FC = () => {
   const { data: wallets, isLoading } = useWalletManifests();
-  console.log(wallets);
   const { connectionLoading, connected, onConnect, onDisconnect } =
     useConnect();
   const { data: addresses } = useAddresses(3);
@@ -104,7 +113,7 @@ const WalletInstall: React.FC = () => {
             alignItems={'start'}
             gap={3}
             css={
-              '& > * {text-overflow: ellipsis; max-width: 100%;}; & > * button[title="Copy"] {display: none;} }'
+              '& > * {text-overflow: ellipsis; max-width: 100%;}; & > * button[title="Copy"] {display: none;}'
             }
           >
             <Heading size={'md'}>Here are your first 3 accounts:</Heading>
@@ -130,7 +139,10 @@ const WalletInstall: React.FC = () => {
             )}
           </VStack>
 
-          <Box>You can now proceed to the next step.</Box>
+          <Alert status="success">
+            <AlertIcon />
+            Quest complete! Proceed to next step
+          </Alert>
         </>
       )}
     </Box>

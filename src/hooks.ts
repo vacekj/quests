@@ -5,7 +5,7 @@ import {
   PenumbraRequestFailure,
   PenumbraState,
 } from '@penumbra-zone/client';
-import { ViewService } from '@penumbra-zone/protobuf';
+import { TendermintProxyService, ViewService } from '@penumbra-zone/protobuf';
 import { useQuery } from '@tanstack/react-query';
 import { uniqBy } from 'es-toolkit';
 import { useEffect, useState } from 'react';
@@ -122,7 +122,6 @@ export function useNotes() {
         client.service(ViewService).notes({}),
       );
 
-      console.log(notes);
       return notes;
     },
   });
@@ -176,6 +175,17 @@ export function useEphemeralAddress({ index }: { index: number }) {
           account: index,
         },
       });
+    },
+  });
+}
+
+export function useCurrentChainStatus() {
+  const { connected } = useConnect();
+  return useQuery({
+    queryKey: ['blockNumber', connected],
+    staleTime: 0,
+    queryFn: async () => {
+      return client.service(TendermintProxyService).getStatus({});
     },
   });
 }

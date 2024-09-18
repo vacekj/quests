@@ -26,22 +26,6 @@ const pages = [
     content: () => <Deposit />,
   },
   { title: 'Stake your UM', content: () => <Staking /> },
-  {
-    title: 'Shielded Staking',
-    content: () => <div>Shielded Staking content</div>,
-  },
-  {
-    title: 'Decentralized Governance',
-    content: () => <div>Decentralized Governance content</div>,
-  },
-  {
-    title: 'Selective Disclosure',
-    content: () => <div>Selective Disclosure content</div>,
-  },
-  {
-    title: 'Using Penumbra on the web',
-    content: () => <div>Using Penumbra on the web content</div>,
-  },
 ];
 
 function App() {
@@ -114,13 +98,11 @@ function App() {
                         </VStack>
                       </Box>
 
-                      {/* Main content */}
                       <Box flex={1} p={8} overflowY="auto">
                         <Heading as="h1" size="xl" mb={4}>
                           {pages[currentPage].title}
                         </Heading>
 
-                        {/* This is where you would insert your page content */}
                         <Box>{pages[currentPage].content()}</Box>
                       </Box>
                     </Flex>
