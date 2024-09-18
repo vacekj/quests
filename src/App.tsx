@@ -25,7 +25,10 @@ const pages = [
     title: 'Deposit into Penumbra',
     content: () => <Deposit />,
   },
+  { title: 'Swap tokens', content: () => <Staking /> },
   { title: 'Stake your UM', content: () => <Staking /> },
+  { title: 'Vote in Governance', content: () => <Staking /> },
+  { title: 'Disconnect wallet', content: () => <Staking /> },
 ];
 
 function App() {
