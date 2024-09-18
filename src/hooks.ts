@@ -6,6 +6,7 @@ import {
   PenumbraState,
 } from '@penumbra-zone/client';
 import { TendermintProxyService, ViewService } from '@penumbra-zone/protobuf';
+import type { DelegationsByAddressIndexResponse } from '@penumbra-zone/protobuf/penumbra/view/v1/view_pb';
 import { useQuery } from '@tanstack/react-query';
 import { uniqBy } from 'es-toolkit';
 import { useEffect, useState } from 'react';
@@ -106,8 +107,25 @@ export function useBalances() {
       const balances = await Array.fromAsync(
         client.service(ViewService).balances({}),
       );
-
       return balances;
+    },
+  });
+}
+
+export function useDelegations() {
+  const { connected } = useConnect();
+  return useQuery({
+    queryKey: ['delegations', connected],
+    staleTime: 0,
+    queryFn: async () => {
+      const delegations = await Array.fromAsync(
+        client.service(ViewService).delegationsByAddressIndex({
+          addressIndex: {
+            account: 0,
+          },
+        }),
+      );
+      return delegations;
     },
   });
 }

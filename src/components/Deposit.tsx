@@ -96,31 +96,6 @@ const Deposit: React.FC = () => {
           balances.
         </AlertDescription>
       </Alert>
-      <Accordion
-        allowToggle
-        borderWidth={'0'}
-        css={'* { border-width: 0!important;}'}
-      >
-        <AccordionItem>
-          <AccordionButton color={'grey'}>
-            <Box as="span" flex="1" textAlign="left">
-              Show old deposits
-            </Box>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel>
-            {depositsWithNotes.length > 0 &&
-              depositsWithNotes?.map((balanceWithNote) => {
-                return (
-                  <DepositRow
-                    key={JSON.stringify(balanceWithNote)}
-                    balanceWithNote={balanceWithNote}
-                  />
-                );
-              })}
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
 
       {depositedBalances.length > 0 &&
         depositedBalances.map(({ balance, note }) => (
@@ -135,6 +110,34 @@ const Deposit: React.FC = () => {
             </Flex>
           </Alert>
         ))}
+
+      {depositsWithNotes.length > 0 && (
+        <Accordion
+          allowToggle
+          borderWidth={'0'}
+          css={'* { border-width: 0!important;}'}
+        >
+          <AccordionItem>
+            <AccordionButton color={'grey'}>
+              <Box as="span" flex="1" textAlign="left">
+                Show old deposits
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>
+              {depositsWithNotes.length > 0 &&
+                depositsWithNotes?.map((balanceWithNote) => {
+                  return (
+                    <DepositRow
+                      key={JSON.stringify(balanceWithNote)}
+                      balanceWithNote={balanceWithNote}
+                    />
+                  );
+                })}
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
+      )}
     </Box>
   );
 };

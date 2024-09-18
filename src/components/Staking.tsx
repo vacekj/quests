@@ -1,24 +1,39 @@
 import {
   Alert,
-  AlertDescription,
   AlertIcon,
   Box,
   Flex,
-  HStack,
   ListItem,
   Text,
   UnorderedList,
   VStack,
-  useColorModeValue,
 } from '@chakra-ui/react';
-
-import { ChainRegistryClient } from '@penumbra-labs/registry';
-import type { ValueView } from '@penumbra-zone/protobuf/penumbra/core/asset/v1/asset_pb';
+import type {
+  ValueView,
+  ValueView_KnownAssetId,
+} from '@penumbra-zone/protobuf/penumbra/core/asset/v1/asset_pb';
+import { ValidatorInfo } from '@penumbra-zone/protobuf/penumbra/core/component/stake/v1/stake_pb';
 import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
 import type React from 'react';
-import { useBalances } from '../hooks';
+import { useBalances, useDelegations } from '../hooks';
 
 const Staking: React.FC = () => {
+  const { data: delegations } = useDelegations();
+  const validators =
+    delegations
+      ?.filter(
+        (delegation) =>
+          delegation?.valueView?.valueView?.value?.amount?.toJsonString() !==
+          '{}',
+      )
+      .map((delegation) => {
+        console.log(delegation);
+        const valueView = delegation.valueView?.valueView
+          ?.value as ValueView_KnownAssetId;
+        return ValidatorInfo.fromBinary(
+          valueView.extendedMetadata?.value as Uint8Array,
+        );
+      }) ?? [];
   const { data: balances } = useBalances();
   const delegationTokens =
     balances?.filter(
@@ -114,6 +129,11 @@ const Staking: React.FC = () => {
           </Flex>
         </VStack>
       )}
+      <VStack>
+        {validators.map((validator) => (
+          <Box key={validator.toJsonString()}>{validator?.validator?.name}</Box>
+        ))}
+      </VStack>
     </Box>
   );
 };
