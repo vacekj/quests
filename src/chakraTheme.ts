@@ -202,6 +202,9 @@ const theme = extendTheme({
   components: {
     // Add any custom component styles here
   },
+  config: {
+    initialColorMode: 'dark',
+  },
 });
 
 export default theme;

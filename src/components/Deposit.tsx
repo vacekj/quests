@@ -1,3 +1,4 @@
+import { CompleteQuest } from '@/src/components/CompleteQuest.tsx';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import {
   Accordion,
@@ -56,11 +57,9 @@ const Deposit: React.FC = () => {
   const depositedBalances = depositsWithNotes.filter(
     ({ note }) => currentBlock - (note.noteRecord?.heightCreated ?? 0n) < 50,
   );
-
+  console.log(data);
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
-      <Heading as={'h1'}>Quest 2: Shielding Funds</Heading>
-
       <div>
         Now it's time to shield your funds and transfer them into Penumbra. Pick
         an account from Prax by clicking the extension icon, click the IBC
@@ -111,6 +110,8 @@ const Deposit: React.FC = () => {
           </Alert>
         ))}
 
+      {depositedBalances.length > 0 && <CompleteQuest />}
+
       {depositsWithNotes.length > 0 && (
         <Accordion
           allowToggle
@@ -155,9 +156,10 @@ function DepositRow({
   const source = note.noteRecord?.source?.source
     ?.value as CommitmentSource_Ics20Transfer;
   const chainId = source.sender.replace(/^(\D+)(\d).*$/, '$1-$2');
+  console.log(source);
   const chainName = capitalize(source.sender.replace(/^(\D+).*$/, '$1'));
   return (
-    <Flex gap={3} alignItems={'center'} key={balance.toJsonString()}>
+    <Flex mt={3} gap={3} alignItems={'center'} key={balance.toJsonString()}>
       Deposited
       <ValueViewComponent
         key={balance.toJsonString()}
@@ -167,12 +169,22 @@ function DepositRow({
       <ChevronRightIcon />
       <Link
         textDecoration={'underline'}
-        href={`https://ibc.range.org/ibc/status?id=${chainId}/${source.channelId}/${source.packetSeq}`}
+        target={'_blank'}
+        href={`https://ibc.range.org/ibc/status?id=${chainIdToExplorerChainName(chainId)}/${source.channelId}/${source.packetSeq}`}
       >
         Inspect deposit
       </Link>
     </Flex>
   );
+}
+
+function chainIdToExplorerChainName(chainId: string) {
+  switch (chainId) {
+    case 'osmo-1':
+      return 'osmosis-1';
+    default:
+      return chainId;
+  }
 }
 
 export default Deposit;

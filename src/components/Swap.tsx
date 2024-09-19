@@ -19,7 +19,7 @@ import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
 import type React from 'react';
 import { useBalances, useDelegations } from '../hooks';
 
-const Staking: React.FC = () => {
+const Swap: React.FC = () => {
   const { data: delegations } = useDelegations();
   const validators =
     delegations
@@ -193,4 +193,4 @@ const Staking: React.FC = () => {
   );
 };
 
-export default Staking;
+export default Swap;

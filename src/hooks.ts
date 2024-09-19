@@ -6,7 +6,6 @@ import {
   PenumbraState,
 } from '@penumbra-zone/client';
 import { TendermintProxyService, ViewService } from '@penumbra-zone/protobuf';
-import type { DelegationsByAddressIndexResponse } from '@penumbra-zone/protobuf/penumbra/view/v1/view_pb';
 import { useQuery } from '@tanstack/react-query';
 import { uniqBy } from 'es-toolkit';
 import { useEffect, useState } from 'react';
@@ -137,7 +136,9 @@ export function useNotes() {
     staleTime: 0,
     queryFn: async () => {
       const notes = await Array.fromAsync(
-        client.service(ViewService).notes({}),
+        client.service(ViewService).notes({
+          includeSpent: true,
+        }),
       );
 
       return notes;

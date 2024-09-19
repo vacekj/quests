@@ -1,3 +1,4 @@
+import { CompleteQuest } from '@/src/components/CompleteQuest.tsx';
 import { client } from '@/src/penumbra';
 import {
   Alert,
@@ -36,23 +37,22 @@ const WalletInstall: React.FC = () => {
     Object.values(wallets).some((manifest) => manifest.name.includes('Prax'));
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
-      <Heading as={'h1'}>Quest 1: Connecting a Wallet</Heading>
-      {!isPraxInstalled && (
-        <>
-          <Box>
-            In order to interact with Penumbra, you need a compatible wallet.
-            One such option is{' '}
-            <Link
-              textDecor={'underline'}
-              href={
-                'https://chromewebstore.google.com/detail/prax-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe'
-              }
-            >
-              Prax Wallet
-            </Link>
-            . Visit the link and click Add to Chrome to install it, then come
-            back to this page.
-          </Box>
+      <>
+        <Box>
+          In order to interact with Penumbra, you need a compatible wallet. One
+          such option is{' '}
+          <Link
+            textDecor={'underline'}
+            href={
+              'https://chromewebstore.google.com/detail/prax-wallet/lkpmkhpnhknhmibgnmmhdhgdilepfghe'
+            }
+          >
+            Prax Wallet
+          </Link>
+          . Visit the link and click Add to Chrome to install it, then come back
+          to this page.
+        </Box>
+        {!isPraxInstalled && (
           <Button
             onClick={() => {
               location.reload();
@@ -60,8 +60,8 @@ const WalletInstall: React.FC = () => {
           >
             I've installed Prax
           </Button>
-        </>
-      )}
+        )}
+      </>
 
       {isPraxInstalled && (
         <>
@@ -139,10 +139,15 @@ const WalletInstall: React.FC = () => {
             )}
           </VStack>
 
-          <Alert status="success">
-            <AlertIcon />
-            Quest complete! Proceed to next step
-          </Alert>
+          {connected && (
+            <>
+              <Alert status="success">
+                <AlertIcon />
+                Quest complete! Proceed to next step
+              </Alert>
+              <CompleteQuest />
+            </>
+          )}
         </>
       )}
     </Box>
