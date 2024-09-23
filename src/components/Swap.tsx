@@ -29,7 +29,6 @@ const Swap: React.FC = () => {
           '{}',
       )
       .map((delegation) => {
-        console.log(delegation);
         const valueView = delegation.valueView?.valueView
           ?.value as ValueView_KnownAssetId;
         return ValidatorInfo.fromBinary(

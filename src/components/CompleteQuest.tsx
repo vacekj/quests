@@ -15,8 +15,7 @@ export function CompleteQuest() {
         const nextQuest =
           Object.keys(quests)[Object.keys(quests).indexOf(pathname) + 2];
         markQuestComplete(pathname);
-        console.log(nextQuest);
-        console.log(pathname);
+
         navigate(`/${nextQuest}`);
       }}
     >

@@ -57,7 +57,7 @@ const Deposit: React.FC = () => {
   const depositedBalances = depositsWithNotes.filter(
     ({ note }) => currentBlock - (note.noteRecord?.heightCreated ?? 0n) < 50,
   );
-  console.log(data);
+
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <div>
@@ -156,7 +156,7 @@ function DepositRow({
   const source = note.noteRecord?.source?.source
     ?.value as CommitmentSource_Ics20Transfer;
   const chainId = source.sender.replace(/^(\D+)(\d).*$/, '$1-$2');
-  console.log(source);
+
   const chainName = capitalize(source.sender.replace(/^(\D+).*$/, '$1'));
   return (
     <Flex mt={3} gap={3} alignItems={'center'} key={balance.toJsonString()}>
