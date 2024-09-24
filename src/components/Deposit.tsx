@@ -19,14 +19,21 @@ import type {
   ValueView_KnownAssetId,
 } from '@penumbra-zone/protobuf/penumbra/core/asset/v1/asset_pb';
 import type { CommitmentSource_Ics20Transfer } from '@penumbra-zone/protobuf/penumbra/core/component/sct/v1/sct_pb';
+import { AddressView } from '@penumbra-zone/protobuf/penumbra/core/keys/v1/keys_pb';
 import type {
   BalancesResponse,
   NotesResponse,
 } from '@penumbra-zone/protobuf/penumbra/view/v1/view_pb';
+import { AddressViewComponent } from '@penumbra-zone/ui/AddressViewComponent';
 import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
 import { capitalize } from 'es-toolkit';
 import type React from 'react';
-import { useBalances, useCurrentChainStatus, useNotes } from '../hooks';
+import {
+  useBalances,
+  useCurrentChainStatus,
+  useEphemeralAddress,
+  useNotes,
+} from '../hooks';
 
 const Deposit: React.FC = () => {
   const { data } = useNotes();
@@ -57,14 +64,33 @@ const Deposit: React.FC = () => {
   const depositedBalances = depositsWithNotes.filter(
     ({ note }) => currentBlock - (note.noteRecord?.heightCreated ?? 0n) < 50,
   );
+  const { data: ibcInAddress } = useEphemeralAddress({
+    index: 0,
+  });
 
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <div>
-        Now it's time to shield your funds and transfer them into Penumbra. Pick
-        an account from Prax by clicking the extension icon, click the IBC
-        Deposit Address checkbox, and copy the address.
+        Now it's time to shield your funds and transfer them into Penumbra.
+        We've displayed one of your IBC Deposit addresses for you convenience
+        below. Copy it using the button on the right.
       </div>
+
+      {ibcInAddress?.address && (
+        <AddressViewComponent
+          addressView={
+            new AddressView({
+              addressView: {
+                case: 'decoded',
+                value: {
+                  address: ibcInAddress.address,
+                },
+              },
+            })
+          }
+        />
+      )}
+
       <Alert status={'info'}>
         <AlertIcon />
         <AlertDescription>
