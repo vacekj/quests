@@ -8,9 +8,8 @@ import {
 import { TendermintProxyService, ViewService } from '@penumbra-zone/protobuf';
 import { useQuery } from '@tanstack/react-query';
 import { uniqBy } from 'es-toolkit';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-// Common react api for fetching wallet data to render the list of injected wallets
 export const useWalletManifests = () => {
   return useQuery<Record<string, PenumbraManifest>>({
     queryKey: ['providerManifests'],
@@ -29,27 +28,31 @@ export const useWalletManifests = () => {
 };
 
 export const useConnect = () => {
-  const [connectionLoading, setConnectionLoading] = useState<boolean>(false);
-  const [connected, setConnected] = useState<string>();
-
-  const reconnect = async () => {
-    const providers = PenumbraClient.getProviders();
-    const connected = Object.keys(providers).find((origin) =>
-      PenumbraClient.isProviderConnected(origin),
-    );
-    if (!connected) return;
-    try {
-      await client.connect(connected);
-      setConnected(connected);
-    } catch (error) {
-      /* no-op */
-    }
-  };
+  const {
+    data: connected,
+    isLoading: connectionLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['connection'],
+    queryFn: async () => {
+      const providers = PenumbraClient.getProviders();
+      const connected = Object.keys(providers).find((origin) =>
+        PenumbraClient.isProviderConnected(origin),
+      );
+      if (!connected) return undefined;
+      try {
+        await client.connect(connected);
+        return connected;
+      } catch (error) {
+        return undefined;
+      }
+    },
+  });
 
   const onConnect = async (origin: string) => {
     try {
-      setConnectionLoading(true);
       await client.connect(origin);
+      await refetch();
     } catch (error) {
       if (error instanceof Error && error.cause) {
         if (error.cause === PenumbraRequestFailure.Denied) {
@@ -61,8 +64,6 @@ export const useConnect = () => {
           alert('Not logged in: please login into the extension and try again');
         }
       }
-    } finally {
-      setConnectionLoading(false);
     }
   };
 
@@ -70,24 +71,22 @@ export const useConnect = () => {
     if (!client.connected) return;
     try {
       await client.disconnect();
+      await refetch();
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Monitors the connection
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    // If Prax is connected on page load, reconnect to ensure the connection is still active
-    reconnect();
     client.onConnectionStateChange((event) => {
-      if (event.state === PenumbraState.Connected) {
-        setConnected(event.origin);
-      } else {
-        setConnected(undefined);
+      if (
+        event.state === PenumbraState.Connected ||
+        event.state === PenumbraState.Disconnected
+      ) {
+        refetch();
       }
     });
-  }, []);
+  }, [refetch]);
 
   return {
     connectionLoading,
