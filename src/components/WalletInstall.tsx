@@ -1,31 +1,20 @@
 import { CompleteQuest } from '@/src/components/CompleteQuest.tsx';
-import { client } from '@/src/penumbra';
 import {
   Alert,
   AlertIcon,
   Box,
   Button,
-  Flex,
   Heading,
   Link,
   VStack,
 } from '@chakra-ui/react';
-import { ViewService } from '@penumbra-zone/protobuf';
 import type {
   AddressView,
   AddressView_Decoded,
 } from '@penumbra-zone/protobuf/penumbra/core/keys/v1/keys_pb';
 import { AddressViewComponent } from '@penumbra-zone/ui/AddressViewComponent';
-import { Button as PenumbraButton } from '@penumbra-zone/ui/Button';
-import { useQuery } from '@tanstack/react-query';
 import type React from 'react';
-import {
-  useAddresses,
-  useAddressesWithBalance,
-  useConnect,
-  useEphemeralAddress,
-  useWalletManifests,
-} from '../hooks';
+import { useAddresses, useConnect, useWalletManifests } from '../hooks';
 
 const WalletInstall: React.FC = () => {
   const { data: wallets, isLoading } = useWalletManifests();
@@ -35,6 +24,7 @@ const WalletInstall: React.FC = () => {
   const isPraxInstalled =
     wallets &&
     Object.values(wallets).some((manifest) => manifest.name.includes('Prax'));
+
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <>

@@ -3,7 +3,6 @@ import Disconnect from '@/src/components/Disconnect.tsx';
 import Staking from '@/src/components/Staking.tsx';
 import Swap from '@/src/components/Swap.tsx';
 import WalletInstall from '@/src/components/WalletInstall.tsx';
-import { fadeConfig } from '@chakra-ui/react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -19,18 +18,16 @@ type QuestPath = keyof typeof quests;
 export const quests: Record<string, React.FC> = {
   wallet: WalletInstall,
   deposit: Deposit,
-  // swap: Swap,
+  swap: Swap,
   stake: Staking,
-  // vote: null,
   disconnect: Disconnect,
 } as const;
 
 export const questNames: Record<QuestPath, string> = {
   wallet: 'Setup a Wallet',
   deposit: 'Deposit funds',
-  // swap: 'Swap tokens',
+  swap: 'Swap tokens',
   stake: 'Stake UM',
-  // vote: null,
   disconnect: 'Disconnect wallet',
 };
 

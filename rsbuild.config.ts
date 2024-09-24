@@ -3,6 +3,12 @@ import { pluginReact } from '@rsbuild/plugin-react';
 
 export default defineConfig({
   plugins: [pluginReact()],
+  server: {
+    publicDir: {
+      name: 'public',
+      watch: true,
+    },
+  },
   html: {
     title: 'Penumbra Quests',
     favicon:
