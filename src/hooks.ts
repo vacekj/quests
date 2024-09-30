@@ -216,7 +216,7 @@ export function useSetScanSinceBlock() {
   useEffect(() => {
     if (
       Number.isNaN(scanSinceBlockHeight) ||
-      latestBlockHeight - scanSinceBlockHeight > 3
+      latestBlockHeight - scanSinceBlockHeight > 100
     ) {
       setScanSinceBlockHeight(latestBlockHeight);
     }
