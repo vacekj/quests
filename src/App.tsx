@@ -1,6 +1,3 @@
-import Disconnect from '@/src/components/Disconnect.tsx';
-import Staking from '@/src/components/Staking.tsx';
-import Swap from '@/src/components/Swap.tsx';
 import { Welcome } from '@/src/components/Welcome.tsx';
 import { questNames, quests, useQuestStore } from '@/src/store.ts';
 import {
@@ -8,14 +5,18 @@ import {
   Button,
   ChakraProvider,
   Container,
+  DarkMode,
   Flex,
+  HStack,
   Heading,
+  LightMode,
   Progress,
   VStack,
+  useColorMode,
 } from '@chakra-ui/react';
 import { PenumbraUIProvider } from '@penumbra-zone/ui/PenumbraUIProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Link,
   Route,
@@ -24,12 +25,17 @@ import {
   useLocation,
 } from 'react-router-dom';
 import theme from './chakraTheme';
-import Deposit from './components/Deposit.tsx';
-import WalletInstall from './components/WalletInstall.tsx';
+
 const queryClient = new QueryClient();
 
 function App() {
   const { completionPercent } = useQuestStore();
+  const { colorMode, toggleColorMode, setColorMode } = useColorMode();
+  useEffect(() => {
+    if (colorMode === 'light') {
+      setColorMode('dark');
+    }
+  }, [colorMode, setColorMode]);
   return (
     <ChakraProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
@@ -50,7 +56,6 @@ function App() {
                   </Heading>
                 </Flex>
               </Flex>
-
               {/* Progress bar */}
               <Progress
                 size="sm"
@@ -61,7 +66,6 @@ function App() {
                 rounded={'sm'}
                 margin="1.5rem"
               />
-
               <Flex>
                 <Sidebar />
                 <Box

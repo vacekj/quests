@@ -44,7 +44,11 @@ const Swap: React.FC = () => {
           wish to swap between:
         </Text>
 
-        <Image src="/images/swap-tokens-1.png" alt="Token swap interface" />
+        <Image
+          w={'max-content'}
+          src="/images/swap-tokens-1.png"
+          alt="Token swap interface"
+        />
 
         <Text>
           The left-hand side specifies the source token, which you will swap for
@@ -75,7 +79,11 @@ const Swap: React.FC = () => {
 
         <Box height="4" />
 
-        <Image src="/images/swap-instant-1.png" alt="Instant swap preview" />
+        <Image
+          w={'max-content'}
+          src="/images/swap-instant-1.png"
+          alt="Instant swap preview"
+        />
 
         <Text>
           If you're happy with the proposed swap, press the `Swap` button and
@@ -114,6 +122,7 @@ const Swap: React.FC = () => {
         <Box height="4" />
 
         <Image
+          w={'max-content'}
           src="/images/swap-gda-1.png"
           alt="Gradual Dutch Auction interface"
         />
@@ -126,7 +135,11 @@ const Swap: React.FC = () => {
 
         <Box height="4" />
 
-        <Image src="/images/swap-gda-2.png" alt="Dutch Auction preview" />
+        <Image
+          w={'max-content'}
+          src="/images/swap-gda-2.png"
+          alt="Dutch Auction preview"
+        />
 
         <Text>
           As with the <Text as="b">Instant Swap</Text>, you can then press
