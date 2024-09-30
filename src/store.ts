@@ -11,6 +11,8 @@ interface QuestState {
   markQuestComplete: (questPath: string) => void;
   markQuestIncomplete: (questPath: string) => void;
   completionPercent: () => number;
+  scanSinceBlockHeight: number;
+  setScanSinceBlockHeight: (height: number) => void;
 }
 
 type QuestPath = keyof typeof quests;
@@ -33,7 +35,7 @@ export const questNames: Record<QuestPath, string> = {
 
 export const useQuestStore = create<QuestState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       completedQuests: Object.fromEntries(
         Object.keys(quests).map((key) => [key, false]),
       ),
@@ -46,6 +48,9 @@ export const useQuestStore = create<QuestState>()(
         set((state) => ({
           completedQuests: { ...state.completedQuests, [questPath]: false },
         })),
+      scanSinceBlockHeight: 0,
+      setScanSinceBlockHeight: (height) =>
+        set({ scanSinceBlockHeight: height }),
     }),
     {
       name: 'quest-storage',

@@ -1,3 +1,5 @@
+import { useBalances, useNotes, useSetScanSinceBlock } from '@/src/hooks.ts';
+import { client } from '@/src/penumbra.ts';
 import {
   Box,
   Heading,
@@ -11,6 +13,7 @@ import {
 import type React from 'react';
 
 const Swap: React.FC = () => {
+  useSetScanSinceBlock();
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <VStack spacing={6} align="stretch">
@@ -35,8 +38,8 @@ const Swap: React.FC = () => {
 
         <Text>
           The simplest type of swap available is an "instant swap". This can be
-          accessed by setting the `Speed` slider all the way to the left-hand
-          setting (`Instant Price`).
+          accessed by setting the 'Speed' slider all the way to the left-hand
+          setting ('Instant Price').
         </Text>
 
         <Text>
@@ -53,7 +56,7 @@ const Swap: React.FC = () => {
         <Text>
           The left-hand side specifies the source token, which you will swap for
           the right-hand side. The amount of the source token you wish to swap
-          is specified in the input box below the `Trade` label.
+          is specified in the input box below the 'Trade' label.
         </Text>
 
         <Text>
@@ -63,7 +66,7 @@ const Swap: React.FC = () => {
 
         <Text>
           To see a preview of how the swap will execute, you can press the
-          `Estimate` button. This will show you information including:
+          'Estimate' button. This will show you information including:
         </Text>
 
         <UnorderedList spacing={2}>
@@ -86,13 +89,13 @@ const Swap: React.FC = () => {
         />
 
         <Text>
-          If you're happy with the proposed swap, press the `Swap` button and
+          If you're happy with the proposed swap, press the 'Swap' button and
           wait for the transaction to be built.
         </Text>
 
         <Text>
           Prax will prompt you to sign the transaction after it's built. Click
-          `Approve` in the extension and your swap will be executed at market
+          'Approve' in the extension and your swap will be executed at market
           price.
         </Text>
 
@@ -106,7 +109,7 @@ const Swap: React.FC = () => {
         </Text>
 
         <Text>
-          Using the `Speed` slider mechanism, you can view how different time
+          Using the 'Speed' slider mechanism, you can view how different time
           scales affect the number of auctions that will be created. By moving
           the slider to the right, the auction will take place over a greater
           amount of time, leading to tokens being sold at more price points.
@@ -128,7 +131,7 @@ const Swap: React.FC = () => {
         />
 
         <Text>
-          Press `Start auctions` and Prax will present to you the proposed
+          Press 'Start auctions' and Prax will present to you the proposed
           transaction, which allows you to view all the individual Dutch
           Auctions:
         </Text>
@@ -143,7 +146,7 @@ const Swap: React.FC = () => {
 
         <Text>
           As with the <Text as="b">Instant Swap</Text>, you can then press
-          `Approve` in Prax to submit the auction.
+          'Approve' in Prax to submit the auction.
         </Text>
       </VStack>
     </Box>

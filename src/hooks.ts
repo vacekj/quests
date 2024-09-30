@@ -1,4 +1,5 @@
 import { client } from '@/src/penumbra';
+import { useQuestStore } from '@/src/store.ts';
 import {
   PenumbraClient,
   type PenumbraManifest,
@@ -206,4 +207,19 @@ export function useCurrentChainStatus() {
       return client.service(TendermintProxyService).getStatus({});
     },
   });
+}
+
+export function useSetScanSinceBlock() {
+  const { scanSinceBlockHeight, setScanSinceBlockHeight } = useQuestStore();
+  const { data: status } = useCurrentChainStatus();
+  const latestBlockHeight = Number(status?.syncInfo?.latestBlockHeight ?? 0n);
+  useEffect(() => {
+    if (
+      Number.isNaN(scanSinceBlockHeight) ||
+      latestBlockHeight - scanSinceBlockHeight > 3
+    ) {
+      setScanSinceBlockHeight(latestBlockHeight);
+    }
+  }, [scanSinceBlockHeight, setScanSinceBlockHeight, latestBlockHeight]);
+  console.log(scanSinceBlockHeight);
 }
