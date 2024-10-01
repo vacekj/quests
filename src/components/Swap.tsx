@@ -5,16 +5,25 @@ import {
   useSwaps,
 } from '@/src/hooks.ts';
 import { client } from '@/src/penumbra.ts';
+import { useQuestStore } from '@/src/store.ts';
 import {
   Box,
+  Card,
+  CardBody,
+  Flex,
+  HStack,
   Heading,
   Image,
   Link,
   ListItem,
+  Spinner,
   Text,
   UnorderedList,
   VStack,
 } from '@chakra-ui/react';
+import { ValueView } from '@penumbra-zone/protobuf/penumbra/core/asset/v1/asset_pb';
+import type { SwapClaim } from '@penumbra-zone/protobuf/penumbra/core/component/dex/v1/dex_pb';
+import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
 import type React from 'react';
 
 const Swap: React.FC = () => {
@@ -43,6 +52,8 @@ const Swap: React.FC = () => {
           </Link>
           to go to the Minifront Swap page.
         </Text>
+
+        <SwapMonitor />
 
         <Heading as="h2">Instant Swaps</Heading>
 
@@ -162,5 +173,38 @@ const Swap: React.FC = () => {
     </Box>
   );
 };
+
+function SwapMonitor() {
+  const { scanSinceBlockHeight } = useQuestStore();
+  const { data: swaps } = useSwaps({
+    from: scanSinceBlockHeight,
+    to: 99999999,
+  });
+
+  const swapActions =
+    swaps?.flatMap(
+      (swapTx) =>
+        swapTx?.txInfo?.transaction?.body?.actions?.filter(
+          (action) =>
+            action.action?.case === 'swap' ||
+            action.action?.case === 'swapClaim',
+        ) ?? [],
+    ) ?? [];
+
+  return (
+    <HStack>
+      {swaps?.length ? (
+        <Box>Congratulations! You succesfully executed a swap.</Box>
+      ) : (
+        <Card w={'full'}>
+          <CardBody gap={3} flexDir={'row'} display={'flex'}>
+            <Box>Waiting for a swap to occur</Box>
+            <Spinner />
+          </CardBody>
+        </Card>
+      )}
+    </HStack>
+  );
+}
 
 export default Swap;
