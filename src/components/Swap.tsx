@@ -1,4 +1,9 @@
-import { useBalances, useNotes, useSetScanSinceBlock } from '@/src/hooks.ts';
+import {
+  useBalances,
+  useNotes,
+  useSetScanSinceBlock,
+  useSwaps,
+} from '@/src/hooks.ts';
 import { client } from '@/src/penumbra.ts';
 import {
   Box,
@@ -14,6 +19,11 @@ import type React from 'react';
 
 const Swap: React.FC = () => {
   useSetScanSinceBlock();
+  const { data: swaps } = useSwaps({
+    from: 0,
+    to: 1000000000,
+  });
+  console.log(swaps);
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <VStack spacing={6} align="stretch">

@@ -209,6 +209,38 @@ export function useCurrentChainStatus() {
   });
 }
 
+type BlockRange = {
+  from: number;
+  to: number;
+};
+
+export function useSwaps(blockRange: BlockRange) {
+  const { connected } = useConnect();
+  return useQuery({
+    queryKey: ['swaps', connected],
+    staleTime: 0,
+    queryFn: async () => {
+      console.log('fetching swaps');
+      const txs = await Array.fromAsync(
+        client.service(ViewService).transactionInfo({
+          startHeight: BigInt(blockRange.from),
+          endHeight: BigInt(blockRange.to),
+        }),
+      );
+      console.log(txs);
+      const swaps = txs.filter((tx) =>
+        tx.txInfo?.transaction?.body?.actions?.some(
+          (action) =>
+            action.action?.case === 'swap' ||
+            action.action?.case === 'swapClaim',
+        ),
+      );
+      console.log(swaps);
+      return swaps;
+    },
+  });
+}
+
 export function useSetScanSinceBlock() {
   const { scanSinceBlockHeight, setScanSinceBlockHeight } = useQuestStore();
   const { data: status } = useCurrentChainStatus();
@@ -221,5 +253,4 @@ export function useSetScanSinceBlock() {
       setScanSinceBlockHeight(latestBlockHeight);
     }
   }, [scanSinceBlockHeight, setScanSinceBlockHeight, latestBlockHeight]);
-  console.log(scanSinceBlockHeight);
 }
