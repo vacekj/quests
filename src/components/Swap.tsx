@@ -1,17 +1,14 @@
 import {
-  useBalances,
-  useNotes,
+  getMetadata,
+  useFeeMetadata,
   useSetScanSinceBlock,
   useSwaps,
 } from '@/src/hooks.ts';
-import { client } from '@/src/penumbra.ts';
 import { useQuestStore } from '@/src/store.ts';
 import {
   Box,
   Card,
   CardBody,
-  Flex,
-  HStack,
   Heading,
   Image,
   Link,
@@ -21,9 +18,16 @@ import {
   UnorderedList,
   VStack,
 } from '@chakra-ui/react';
-import { ValueView } from '@penumbra-zone/protobuf/penumbra/core/asset/v1/asset_pb';
-import type { SwapClaim } from '@penumbra-zone/protobuf/penumbra/core/component/dex/v1/dex_pb';
-import { ValueViewComponent } from '@penumbra-zone/ui/ValueViewComponent';
+import type {
+  SwapView,
+  SwapView_Visible,
+} from '@penumbra-zone/protobuf/penumbra/core/component/dex/v1/dex_pb';
+import type {
+  ActionView,
+  TransactionView,
+} from '@penumbra-zone/protobuf/penumbra/core/transaction/v1/transaction_pb';
+import type { TransactionInfoResponse } from '@penumbra-zone/protobuf/penumbra/view/v1/view_pb';
+import { ActionViewComponent } from '@penumbra-zone/ui/components/tx/action-view';
 import type React from 'react';
 
 const Swap: React.FC = () => {
@@ -32,7 +36,7 @@ const Swap: React.FC = () => {
     from: 0,
     to: 1000000000,
   });
-  console.log(swaps);
+
   return (
     <Box py={3} display={'flex'} flexDir={'column'} gap={'2rem'}>
       <VStack spacing={6} align="stretch">
@@ -177,24 +181,31 @@ const Swap: React.FC = () => {
 function SwapMonitor() {
   const { scanSinceBlockHeight } = useQuestStore();
   const { data: swaps } = useSwaps({
-    from: scanSinceBlockHeight,
+    from: 0 /*scanSinceBlockHeight*/,
     to: 99999999,
   });
-
   const swapActions =
     swaps?.flatMap(
       (swapTx) =>
-        swapTx?.txInfo?.transaction?.body?.actions?.filter(
-          (action) =>
-            action.action?.case === 'swap' ||
-            action.action?.case === 'swapClaim',
-        ) ?? [],
+        swapTx.txInfo?.view?.bodyView?.actionViews
+          ?.filter((action) => action.actionView?.case === 'swap')
+          .map((action) => ({
+            action,
+            fee: swapTx?.txInfo?.view?.bodyView?.transactionParameters?.fee,
+            txView: swapTx?.txInfo?.view,
+          })) ?? [],
     ) ?? [];
 
   return (
-    <HStack>
-      {swaps?.length ? (
-        <Box>Congratulations! You succesfully executed a swap.</Box>
+    <VStack alignItems={'start'}>
+      {swapActions?.length ? (
+        swapActions.map((s) => (
+          <AssetSwapWithFeeMetadataComponent
+            key={s.txView!.toJsonString()}
+            action={s.action!}
+            txv={s.txView!}
+          />
+        ))
       ) : (
         <Card w={'full'}>
           <CardBody gap={3} flexDir={'row'} display={'flex'}>
@@ -203,8 +214,33 @@ function SwapMonitor() {
           </CardBody>
         </Card>
       )}
-    </HStack>
+    </VStack>
+  );
+}
+
+function AssetSwapWithFeeMetadataComponent(props: {
+  txv: TransactionView;
+  action: ActionView;
+}) {
+  /*The link that's displayed when claimTx is defined doesn't work outside minifront*/
+  /* biome-ignore lint/performance/noDelete: ^ */
+  delete (
+    (props.action.actionView.value as SwapView).swapView
+      .value as SwapView_Visible
+  ).claimTx;
+  const { feeValueView } = useFeeMetadata(props.txv, getMetadata);
+  return (
+    <ActionViewComponent
+      av={props.action}
+      key={props.action.toJsonString()}
+      feeValueView={feeValueView}
+    />
   );
 }
 
 export default Swap;
+type RecursiveRequired<T> = Required<{
+  [P in keyof T]: T[P] extends object | undefined
+    ? RecursiveRequired<Required<T[P]>>
+    : T[P];
+}>;

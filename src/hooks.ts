@@ -1,5 +1,6 @@
 import { client } from '@/src/penumbra';
 import { useQuestStore } from '@/src/store.ts';
+import { ChainRegistryClient } from '@penumbra-labs/registry';
 import {
   PenumbraClient,
   type PenumbraManifest,
@@ -7,9 +8,15 @@ import {
   PenumbraState,
 } from '@penumbra-zone/client';
 import { TendermintProxyService, ViewService } from '@penumbra-zone/protobuf';
+import {
+  type AssetId,
+  type Metadata,
+  ValueView,
+} from '@penumbra-zone/protobuf/penumbra/core/asset/v1/asset_pb';
+import type { TransactionView } from '@penumbra-zone/protobuf/penumbra/core/transaction/v1/transaction_pb';
 import { useQuery } from '@tanstack/react-query';
 import { uniqBy } from 'es-toolkit';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useWalletManifests = () => {
   return useQuery<Record<string, PenumbraManifest>>({
@@ -254,3 +261,61 @@ export function useSetScanSinceBlock() {
     }
   }, [scanSinceBlockHeight, setScanSinceBlockHeight, latestBlockHeight]);
 }
+
+// Likely something that calls the registry or view service for metadata
+export type MetadataFetchFn = (arg: {
+  chainId?: string;
+  assetId?: AssetId;
+}) => Promise<Metadata | undefined>;
+
+// Uses supplied metadata fetcher to see if it can augment fee ValueView with metadata
+export const useFeeMetadata = (
+  txv: TransactionView,
+  getMetadata: MetadataFetchFn,
+) => {
+  const amount = txv.bodyView?.transactionParameters?.fee?.amount;
+  const [feeValueView, setFeeValueView] = useState<ValueView>(
+    new ValueView({
+      valueView: {
+        case: 'unknownAssetId',
+        value: { amount },
+      },
+    }),
+  );
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<unknown>();
+
+  useEffect(() => {
+    const chainId = txv.bodyView?.transactionParameters?.chainId;
+    const assetId = txv.bodyView?.transactionParameters?.fee?.assetId;
+    setIsLoading(true);
+    void getMetadata({ chainId, assetId })
+      .then((metadata) => {
+        if (metadata) {
+          const feeValueView = new ValueView({
+            valueView: {
+              case: 'knownAssetId',
+              value: { amount, metadata },
+            },
+          });
+          setFeeValueView(feeValueView);
+        }
+        setIsLoading(false);
+      })
+      .catch((e: unknown) => setError(e));
+  }, [txv, getMetadata, amount]);
+
+  return { feeValueView, isLoading, error };
+};
+
+export const getMetadata: MetadataFetchFn = async ({ assetId }) => {
+  const feeAssetId = assetId
+    ? assetId
+    : new ChainRegistryClient().bundled.globals().stakingAssetId;
+
+  const { denomMetadata } = await client
+    .service(ViewService)
+    .assetMetadataById({ assetId: feeAssetId });
+  return denomMetadata;
+};
