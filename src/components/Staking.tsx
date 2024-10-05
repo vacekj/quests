@@ -5,6 +5,7 @@ import {
   Card,
   CardBody,
   Flex,
+  Image,
   Link,
   ListItem,
   Spinner,
@@ -89,6 +90,11 @@ const Staking: React.FC = () => {
           <Text>
             Select how much 'UM' you wish to delegate, then press 'Delegate':
           </Text>
+          <Image
+            w={'max-content'}
+            src="/images/delegation_amount_example.png"
+            alt="Delegation token amount selection"
+          />
         </VStack>
 
         <Text>
@@ -97,11 +103,22 @@ const Staking: React.FC = () => {
           one of the outputs is to the validator you selected, then click
           'Approve':
         </Text>
+        <Image
+          w={'max-content'}
+          src="/images/delegation_prax.png"
+          alt="Delegation prax"
+        />
 
         <Text>
           You should see a pop-up in the lower right hand of the page indicating
           that the transaction was approved!
         </Text>
+
+        <Image
+          w={'max-content'}
+          src="/images/delegation_popup.png"
+          alt="Delegation popup"
+        />
 
         <Text>
           You will receive the delegation token associated with that validator.
