@@ -10,9 +10,12 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
+  Card,
+  CardBody,
   Flex,
   Heading,
   Link,
+  Spinner,
 } from '@chakra-ui/react';
 import type {
   ValueView,
@@ -121,6 +124,15 @@ const Deposit: React.FC = () => {
           balances.
         </AlertDescription>
       </Alert>
+
+      {depositedBalances.length === 0 && (
+        <Card w={'full'}>
+          <CardBody gap={3} flexDir={'row'} display={'flex'}>
+            <Box>Waiting for a deposit to occur</Box>
+            <Spinner />
+          </CardBody>
+        </Card>
+      )}
 
       {depositedBalances.length > 0 &&
         depositedBalances.map(({ balance, note }) => (

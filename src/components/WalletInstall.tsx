@@ -8,12 +8,14 @@ import {
   Link,
   VStack,
 } from '@chakra-ui/react';
+import { PenumbraClient } from '@penumbra-zone/client';
 import type {
   AddressView,
   AddressView_Decoded,
 } from '@penumbra-zone/protobuf/penumbra/core/keys/v1/keys_pb';
 import { AddressViewComponent } from '@penumbra-zone/ui/AddressViewComponent';
 import type React from 'react';
+import { useInterval } from 'usehooks-ts';
 import { useAddresses, useConnect, useWalletManifests } from '../hooks';
 
 const WalletInstall: React.FC = () => {

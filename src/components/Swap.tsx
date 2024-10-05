@@ -181,7 +181,7 @@ const Swap: React.FC = () => {
 function SwapMonitor() {
   const { scanSinceBlockHeight } = useQuestStore();
   const { data: swaps } = useSwaps({
-    from: 0 /*scanSinceBlockHeight*/,
+    from: scanSinceBlockHeight,
     to: 99999999,
   });
   const swapActions =

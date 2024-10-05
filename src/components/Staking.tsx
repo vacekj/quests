@@ -2,9 +2,12 @@ import {
   Alert,
   AlertIcon,
   Box,
+  Card,
+  CardBody,
   Flex,
   Link,
   ListItem,
+  Spinner,
   Text,
   UnorderedList,
   VStack,
@@ -107,6 +110,15 @@ const Staking: React.FC = () => {
         </Text>
       </VStack>
 
+      {delegationTokens.length === 0 && (
+        <Card w={'full'}>
+          <CardBody gap={3} flexDir={'row'} display={'flex'}>
+            <Box>Waiting for a staking delegation to occur</Box>
+            <Spinner />
+          </CardBody>
+        </Card>
+      )}
+
       {delegationTokens.length > 0 && (
         <VStack alignItems={'start'}>
           <Alert status="success">
@@ -181,11 +193,12 @@ const Staking: React.FC = () => {
               );
             })}
           </Flex>
-          <Box>
+          <Alert mt={3} status="info">
+            <AlertIcon />
             Delegation tokens are liquid - you can swap them the same way you
             would other assets. They will also show up under your Balances in
             frontends.
-          </Box>
+          </Alert>
         </VStack>
       )}
     </Box>
